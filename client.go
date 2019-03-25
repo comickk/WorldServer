@@ -141,6 +141,7 @@ func (c *Client) readPump() {
 	}
 }
 
+//发送chanal
 func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
