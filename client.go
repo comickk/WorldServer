@@ -56,8 +56,17 @@ type Client struct {
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
+		
+		fmt.Println("跑了一个B")
+		msg := make(map[string]interface{})
+		msg["title"] ="quit";
+		msg["who"] = c.id 			
+		send2all, _ := json.Marshal(&msg)
+		c.hub.broadcast <- send2all
+
 		c.conn.Close()
 	}()
+
 	c.conn.SetReadLimit(maxMessageSize)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })

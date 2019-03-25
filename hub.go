@@ -2,8 +2,8 @@ package main
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
-//import "fmt"
-//import "encoding/json"
+// import "fmt"
+// import "encoding/json"
 
 type Hub struct {
 	// Registered clients.
@@ -46,11 +46,12 @@ func (h *Hub) run() {
 		case client := <-h.register:
 			h.clients[client] = true
 			
-		case client := <-h.unregister:
+		case client := <-h.unregister:			
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
-			}
+			}			
+
 		case message := <-h.broadcast:
 			//fmt.Println(string(message))
 			for client := range h.clients {
