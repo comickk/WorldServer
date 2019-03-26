@@ -94,25 +94,29 @@ func (c *Client) readPump() {
 			case "hello?":
 				fmt.Println("新来一个B")
 				//先向自己发送自己id
-				msg["title"] = "hello" 
-				msg["id"] = c.id 
-				newplayer, _ := json.Marshal(&msg)
+				data := make(map[string]interface{})
+				data["title"] = "hello" 
+				data["id"] = c.id 
+				data["x"] = 0
+				data["y"] = 0
+				data["type"] = 1 //RoleType.SELF
+				newplayer, _ := json.Marshal(&data)
 				c.send <- newplayer  //发送新来的id,确保客户端先生成自己
 				fmt.Println(string(newplayer))
-
-				for client:= range c.hub.clients {					
-
+				
+				for client:= range c.hub.clients {	
 					if(client.id != c.id){
-						//向已加入的发送新来的id			
+						//向已加入的发送新来的id
+						data["type"] = 2 //RoleType.PLAYER
+						newplayer, _ := json.Marshal(&data)
 						client.send <- newplayer					
 
-						//向新来的发送已在线的id
-						msg2 := make(map[string]interface{})
-						msg2["title"] ="hello";
-						msg2["id"] = client.id 
-						msg2["x"] = client.x
-						msg2["y"] = client.y
-						oldplayer, _ := json.Marshal(&msg2)
+						//向新来的发送已在线的id						
+						data["id"] = client.id 
+						data["x"] = client.x
+						data["y"] = client.y
+						data["type"] = 2 //RoleType.PLAYER				
+						oldplayer, _ := json.Marshal(&data)
 						c.send <- oldplayer  
 						fmt.Println(string(oldplayer))
 					}		
